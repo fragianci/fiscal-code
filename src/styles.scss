@@ -1,1 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+
+button{
+  -webkit-appearance: none;
+  border: 1px solid rgba(102, 102, 102, 0.3098039216);
+  border-radius: 7px;
+  margin-top: 10px;
+  padding: 8px 20px;
+  &:hover{
+    cursor: pointer;
+  }
+}
+
+span{
+  font-size: 15px;
+  color: red;
+}

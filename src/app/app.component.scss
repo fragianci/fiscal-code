@@ -1,0 +1,74 @@
+.container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  form{
+    background-color: #93e4ff91;
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    padding: 50px 10%;
+    border-radius: 11px;
+    .myInput{
+      height: 16px;
+      margin: 10px;
+      padding: 8px;
+      border-radius: 7px;
+      -webkit-appearance: none;
+      border: 1px solid #626262;
+      &:focus{
+        outline: none;
+      }
+    }
+    .myCheckbox{
+      margin: 0 10px;
+    }
+    .comuneNascita{
+      display: flex;
+      height: 44px;
+      .input{
+        display: flex;
+        flex-direction: column;
+        .errors{
+          display: flex;
+          flex-direction: column;
+        }
+      }
+      .sendCap{
+        opacity: 0.8;
+        &:hover{
+          opacity: 1;
+          transition: 0.3s;
+        }
+      }
+      select{
+        border-radius: 15px;
+        margin: 14px 0 0 291px;
+        height: 25px;
+        padding-left: 4px;
+        width: 110px;
+        position: absolute;
+        &:focus-visible{
+          outline: none;
+        }
+      }
+    }
+    .buttonDiv{
+      text-align: center;
+      margin-top: 10px;
+      button{
+        background: linear-gradient(90deg, rgb(179 175 236) 0%, rgb(3 168 202) 100%);
+        opacity: 0.8;
+        &:not(.disable):hover{
+          opacity: 1;
+          color: white;
+          transition: 0.3s;
+        }
+      }
+    }
+    span{
+      margin: -7px 0 0 12px;
+    }
+  }
+}

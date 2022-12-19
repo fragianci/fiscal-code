@@ -23,11 +23,16 @@
       </div>
       <button type="button" class="sendCap" (click)="sendCap()">Invia CAP</button>
       <select *ngIf="comuniCap.length" name="comuni" id="comuni" formControlName="comune" (change)="scegliComuneNascita()">
+        <option value="" selected disabled hidden>Scegli qui</option>
         <option *ngFor="let comune of comuniCap" [ngValue]="comune">{{comune['nome']}}</option>
       </select>
     </div>
+    <div *ngIf="isLoading" class="cssload-container">
+      <div class="cssload-speeding-wheel"></div>
+    </div>
+
     <div class="buttonDiv">
-      <button type="submit" [disabled]="fiscalCodeForm.invalid || setDisable()" [ngClass]="{disable: fiscalCodeForm.invalid || setDisable()}">Invia</button>
+      <button type="submit" [disabled]="fiscalCodeForm.invalid || !((!male && female) || (male && !female))" [ngClass]="{disable: fiscalCodeForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
     </div>
     <p>{{fiscalCode | uppercase}}</p>
   </form>

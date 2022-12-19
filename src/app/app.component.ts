@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from './services/api.service';
-import { alfanumericiDispari, alfanumericiPari, dateBirthYears, alfanumericiResto } from './shared/consts';
+import { alfanumericiDispari, alfanumericiPari, alfanumericiResto, dateBirthYears } from './shared/consts';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +20,7 @@ export class AppComponent {
   male = false;
   female = false;
   capError = false;
+  isLoading = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -37,14 +37,14 @@ export class AppComponent {
     });
   }
 
-  submit() {
-    setTimeout(() => {
-      this.fiscalCode = this.extractConsonantsFromSurname(this.fiscalCodeForm.controls['cognome'].value)
-        + this.extractConsonantsFromName(this.fiscalCodeForm.controls['nome'].value)
-        + this.getDateBirth(this.fiscalCodeForm.controls['dateBirth'].value)
-        + this.codiceCatastale;
-      this.getCarattereDiControllo();
-    }, 400);
+  async submit() {
+    // setTimeout(() => {
+    this.fiscalCode = this.extractConsonantsFromSurname(this.fiscalCodeForm.controls['cognome'].value)
+      + this.extractConsonantsFromName(this.fiscalCodeForm.controls['nome'].value)
+      + this.getDateBirth(this.fiscalCodeForm.controls['dateBirth'].value)
+      + this.codiceCatastale;
+    this.getCarattereDiControllo();
+    // }, 400);
   }
 
   extractConsonantsFromSurname(word: string) {
@@ -85,23 +85,25 @@ export class AppComponent {
   }
 
   getDateBirth(dateBirth: string) {
-    let dateBirthArray = dateBirth.split('-');
-    let year = dateBirthArray[0].split('').splice(2, 2).join('');
-    let month = dateBirthYears.find((valor) => dateBirthArray[1] === valor.month)?.letter;
-    let day = this.fiscalCodeForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
+    const dateBirthArray = dateBirth.split('-');
+    const year = dateBirthArray[0].split('').splice(2, 2).join('');
+    const month = dateBirthYears.find((valor) => dateBirthArray[1] === valor.month)?.letter;
+    const day = this.fiscalCodeForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
     return year + month + day;
   }
 
   sendCap() {
-    let cap = this.fiscalCodeForm.controls['cap'].value;
-    console.log(this.fiscalCodeForm.controls);
+    this.isLoading = true;
+    const cap = this.fiscalCodeForm.controls['cap'].value;
     this.apiService.getComuni(cap).subscribe({
       next: (res: any) => {
         this.comuniCap = res.data[0].dettaglio_comuni;
         this.capError = false;
+        this.isLoading = false;
       },
       error: (error: any) => {
         console.log(error);
+        this.isLoading = false;
         if (error.status === 404) this.capError = true;
       }
     });
@@ -130,29 +132,5 @@ export class AppComponent {
 
     this.carattereDiControllo = alfanumericiResto.find((alfaNumerico: any) => alfaNumerico.resto === resto.toString())?.lettera ?? '';
     this.fiscalCode += this.carattereDiControllo;
-  }
-
-  setDisable() {
-    switch (true) {
-      case (!this.male && this.female):
-        console.log('ciao');
-
-        return false;
-        break;
-      case (this.male && !this.female):
-        console.log('ciao');
-
-        return false;
-        break;
-      case (this.male && this.female):
-        console.log(this.male && this.female);
-
-        return true;
-        break;
-      default:
-        return true;
-        break;
-    }
-
   }
 }

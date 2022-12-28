@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from './services/api.service';
+import { FiscalCodeService } from './services/fiscal-code.service';
 import { alfanumericiDispari, alfanumericiPari, alfanumericiResto, dateBirthYears } from './shared/consts';
 
 @Component({
@@ -25,6 +26,7 @@ export class AppComponent {
   constructor(
     private formBuilder: FormBuilder,
     private apiService: ApiService,
+    private fiscalCodeService: FiscalCodeService,
   ) {
     this.fiscalCodeForm = this.formBuilder.group({
       cognome: ['', [Validators.required]],
@@ -38,13 +40,11 @@ export class AppComponent {
   }
 
   async submit() {
-    // setTimeout(() => {
     this.fiscalCode = this.extractConsonantsFromSurname(this.fiscalCodeForm.controls['cognome'].value)
       + this.extractConsonantsFromName(this.fiscalCodeForm.controls['nome'].value)
       + this.getDateBirth(this.fiscalCodeForm.controls['dateBirth'].value)
       + this.codiceCatastale;
     this.getCarattereDiControllo();
-    // }, 400);
   }
 
   extractConsonantsFromSurname(word: string) {
@@ -115,22 +115,17 @@ export class AppComponent {
 
   getCarattereDiControllo() {
     let index = 0;
-    let a = 0;
-    let b = 0;
+    let result = 0;
+    let temp: any;
     this.fiscalCode.split('').forEach((char: string) => {
-      if ((index % 2) === 0) {
-        let c = alfanumericiDispari.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
-        if (c) a += +c;
-      } else {
-        let c = alfanumericiPari.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
-        if (c) b += +c;
-      }
+      temp = this.fiscalCodeService.findCarattereDiControllo(index, char);
+      if (temp) result += +temp;
       index++;
     });
-    let result = a + b;
     let resto = result % 26;
 
     this.carattereDiControllo = alfanumericiResto.find((alfaNumerico: any) => alfaNumerico.resto === resto.toString())?.lettera ?? '';
     this.fiscalCode += this.carattereDiControllo;
   }
+
 }

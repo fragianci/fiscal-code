@@ -27,6 +27,7 @@
     .comuneNascita{
       display: flex;
       height: 44px;
+      margin-top: 6px;
       .input{
         display: flex;
         flex-direction: column;
@@ -42,13 +43,11 @@
           transition: 0.3s;
         }
       }
-      select{
+      select.province{
         border-radius: 15px;
-        margin: 14px 0 0 291px;
-        height: 25px;
+        height: 30px;
         padding-left: 4px;
-        width: 110px;
-        position: absolute;
+        width: 160px;
         &:focus-visible{
           outline: none;
         }
@@ -138,6 +137,19 @@
     }
     span{
       margin: -7px 0 0 12px;
+    }
+  }
+}
+
+ejs-autocomplete{
+  margin-top: 7px;
+  span{
+    background-color: white;
+    border: 1px solid grey;
+    display: flex;
+    justify-content: flex-start;
+    select{
+      width: 5px;
     }
   }
 }

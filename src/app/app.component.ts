@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from './services/api.service';
 import { FiscalCodeService } from './services/fiscal-code.service';
-import { alfanumericiDispari, alfanumericiPari, alfanumericiResto, dateBirthYears } from './shared/consts';
+import { alfanumericiResto, dateBirthYears } from './shared/consts';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'fiscal-code-generator';
   fiscalCodeForm: FormGroup = new FormGroup({});
   consonantRegex = /[bcdfghjklmnpqrstvwxysBCDFGHJKLMNPQRSTVWXYZ]/g;
@@ -18,10 +18,14 @@ export class AppComponent {
   codiceCatastale = '';
   carattereDiControllo = '';
   comuniCap = [];
+  province: any = [];
+  dettaglioComuni: any = [];
   male = false;
   female = false;
   capError = false;
   isLoading = false;
+  public dataFields: Object = { value: 'comune' };
+  public comuniAutoComplete: Object[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -34,8 +38,19 @@ export class AppComponent {
       dateBirth: ['', [Validators.required]],
       male: ['', []],
       female: ['', []],
-      cap: ['', [Validators.required]],
+      provincia: ['', [Validators.required]],
       comune: ['', [Validators.required]],
+    });
+  }
+
+  ngOnInit(): void {
+    this.apiService.getProvince('').subscribe({
+      next: (res: any) => {
+        this.province = Object.keys(res.data);
+      },
+      error: (e: any) => {
+        console.log(e);
+      }
     });
   }
 
@@ -61,9 +76,10 @@ export class AppComponent {
   extractConsonantsFromName(word: string) {
     let arrayConsonants = word.match(this.consonantRegex);
     let wordTransformed = arrayConsonants?.join('');
-    if (arrayConsonants && arrayConsonants.length < 3) {
-      wordTransformed = arrayConsonants.join('') + this.extractVocals(word, arrayConsonants.length);
+    if (arrayConsonants && wordTransformed && arrayConsonants.length < 3) {
+      wordTransformed = wordTransformed + this.extractVocals(word, arrayConsonants.length);
     } else if (arrayConsonants && arrayConsonants.length > 3) {
+      // salta la seconda consonante
       wordTransformed = arrayConsonants.slice(0, 1).join('') + arrayConsonants.splice(2, 2).join('');
     } else if (!arrayConsonants) {
       wordTransformed = this.extractVocals(word, 0);
@@ -126,6 +142,28 @@ export class AppComponent {
 
     this.carattereDiControllo = alfanumericiResto.find((alfaNumerico: any) => alfaNumerico.resto === resto.toString())?.lettera ?? '';
     this.fiscalCode += this.carattereDiControllo;
+  }
+
+  selectProvince(provincia: string) {
+    this.apiService.getProvince(provincia).subscribe({
+      next: (res: any) => {
+        this.dettaglioComuni = res.data[0].dettaglio_comuni;
+        let index = -1;
+        this.comuniAutoComplete = this.dettaglioComuni.map((comune: any) => {
+          index++;
+          return { id: index, comune: comune.nome };
+        });
+        console.log(this.comuniAutoComplete);
+
+      },
+      error: (e: any) => {
+        console.log(e);
+      }
+    });
+  }
+
+  selectCity(e: any) {
+    this.codiceCatastale = this.dettaglioComuni.find((comune: any) => comune.nome === e.itemData.comune).codice_catastale;
   }
 
 }

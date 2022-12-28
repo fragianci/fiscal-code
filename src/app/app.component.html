@@ -14,24 +14,35 @@
       <input class="myCheckbox" type="checkbox" id="female" [checked]="female" formControlName="female" [(ngModel)]="female">
     </div>
     <div class="comuneNascita">
-      <div class="input">
+      <!-- <div class="input">
         <input class="myInput" type="number" placeholder="Cap" id="cap" formControlName="cap">
         <div class="errors">
           <span *ngIf="fiscalCodeForm.controls['cap'].errors && fiscalCodeForm.controls['cap'].touched">Inserire il CAP</span>
           <span *ngIf="capError">Comune non trovato</span>
         </div>
-      </div>
-      <button type="button" class="sendCap" (click)="sendCap()">Invia CAP</button>
-      <select *ngIf="comuniCap.length" name="comuni" id="comuni" formControlName="comune" (change)="scegliComuneNascita()">
-        <option value="" selected disabled hidden>Scegli qui</option>
-        <option *ngFor="let comune of comuniCap" [ngValue]="comune">{{comune['nome']}}</option>
+      </div> -->
+      <select class="province" name="province" id="province" formControlName="provincia" (change)="selectProvince(fiscalCodeForm.controls['provincia'].value)">
+        <option value="" selected disabled hidden>Scegli la provincia</option>
+        <option *ngFor="let prov of province" (click)="selectProvince(prov)" [ngValue]="prov">{{prov}}</option>
       </select>
+      <ejs-autocomplete [dataSource]="comuniAutoComplete" [fields]="dataFields" formControlName="comune" (select)="selectCity($event)" placeholder="Seleziona un comune"></ejs-autocomplete>
+      <!-- <input class="myInput" type="text" placeholder="Comune" id="cap" formControlName="comune">
+      <div class="errors">
+        <span *ngIf="fiscalCodeForm.controls['cap'].errors && fiscalCodeForm.controls['cap'].touched">Inserire il comune</span> -->
+      <!-- </div> -->
+      <div></div>
+      <!-- <button type="button" class="sendCap" (click)="sendCap()">Invia CAP</button> -->
+      <!-- <select *ngIf="comuniCap.length" name="comuni" id="comuni" formControlName="comune" (change)="scegliComuneNascita()">
+        <option value="" selected disabled hidden>Scegli qui</option>
+        <option *ngFor="let comune of comuniCap" [ngValue]="comune">{{comune['nome']}}</option> -->
+      <!-- </select> -->
     </div>
     <div *ngIf="isLoading" class="cssload-container">
       <div class="cssload-speeding-wheel"></div>
     </div>
 
     <div class="buttonDiv">
+      <!-- fiscalCodeForm.invalid || !((!male && female) || (male && !female)) -->
       <button type="submit" [disabled]="fiscalCodeForm.invalid || !((!male && female) || (male && !female))" [ngClass]="{disable: fiscalCodeForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
     </div>
     <p>{{fiscalCode | uppercase}}</p>

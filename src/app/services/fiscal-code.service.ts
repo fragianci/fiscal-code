@@ -15,4 +15,13 @@ export class FiscalCodeService {
       return alfanumericiPari.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
     }
   }
+
+  setItemLocalStorage(position: string, value: any) {
+    window.localStorage.setItem(position, JSON.stringify(value));
+  }
+
+  getItemLocalStorage(position: any): any {
+    return window.localStorage.getItem(position);
+  }
+
 }

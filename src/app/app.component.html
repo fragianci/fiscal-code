@@ -43,8 +43,8 @@
 
     <div class="buttonDiv">
       <!-- fiscalCodeForm.invalid || !((!male && female) || (male && !female)) -->
-      <button type="submit" [disabled]="fiscalCodeForm.invalid || !((!male && female) || (male && !female))" [ngClass]="{disable: fiscalCodeForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
+      <button type="submit" [disabled]="false" [ngClass]="{disable: fiscalCodeForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
     </div>
-    <p>{{fiscalCode | uppercase}}</p>
+    <p>{{fiscalCode}}</p>
   </form>
 </div>

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from './services/api.service';
 import { FiscalCodeService } from './services/fiscal-code.service';
 import { alfanumericiResto, dateBirthYears } from './shared/consts';
+import { CodiciFiscali } from './shared/interfaces/codiciFiscali';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit {
   isLoading = false;
   public dataFields: Object = { value: 'comune' };
   public comuniAutoComplete: Object[] = [];
+  codiciFiscali: CodiciFiscali[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -52,6 +54,10 @@ export class AppComponent implements OnInit {
         console.log(e);
       }
     });
+    this.codiciFiscali = JSON.parse(this.fiscalCodeService.getItemLocalStorage('codici-fiscali'));
+    if (this.codiciFiscali === null) this.codiciFiscali = [];
+    console.log(this.codiciFiscali);
+
   }
 
   async submit() {
@@ -59,7 +65,10 @@ export class AppComponent implements OnInit {
       + this.extractConsonantsFromName(this.fiscalCodeForm.controls['nome'].value)
       + this.getDateBirth(this.fiscalCodeForm.controls['dateBirth'].value)
       + this.codiceCatastale;
-    this.getCarattereDiControllo();
+    this.getCarattereDiControllo();;
+    const nomeCognome = this.fiscalCodeForm.controls['nome'].value + this.fiscalCodeForm.controls['cognome'].value;
+    this.codiciFiscali.push({ nomeCognome: nomeCognome, codiceFiscale: this.fiscalCode });
+    this.fiscalCodeService.setItemLocalStorage(`codici-fiscali`, this.codiciFiscali);
   }
 
   extractConsonantsFromSurname(word: string) {
@@ -141,7 +150,7 @@ export class AppComponent implements OnInit {
     let resto = result % 26;
 
     this.carattereDiControllo = alfanumericiResto.find((alfaNumerico: any) => alfaNumerico.resto === resto.toString())?.lettera ?? '';
-    this.fiscalCode += this.carattereDiControllo;
+    this.fiscalCode = this.fiscalCode.toUpperCase() + this.carattereDiControllo;
   }
 
   selectProvince(provincia: string) {

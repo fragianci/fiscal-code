@@ -449,3 +449,46 @@ export const alfanumericiResto = [
     lettera: 'Z'
   }
 ];
+
+export const omocodici = [
+  {
+    cifra: 0,
+    carattere: 'L'
+  },
+  {
+    cifra: 1,
+    carattere: 'M'
+  },
+  {
+    cifra: 2,
+    carattere: 'N'
+  },
+  {
+    cifra: 3,
+    carattere: 'P'
+  },
+  {
+    cifra: 4,
+    carattere: 'Q'
+  },
+  {
+    cifra: 5,
+    carattere: 'R'
+  },
+  {
+    cifra: 6,
+    carattere: 'S'
+  },
+  {
+    cifra: 7,
+    carattere: 'T'
+  },
+  {
+    cifra: 8,
+    carattere: 'U'
+  },
+  {
+    cifra: 9,
+    carattere: 'V'
+  },
+];

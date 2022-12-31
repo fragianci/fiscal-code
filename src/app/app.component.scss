@@ -36,13 +36,6 @@
           flex-direction: column;
         }
       }
-      .sendCap{
-        opacity: 0.8;
-        &:hover{
-          opacity: 1;
-          transition: 0.3s;
-        }
-      }
       select.province{
         border-radius: 15px;
         height: 30px;
@@ -137,19 +130,6 @@
     }
     span{
       margin: -7px 0 0 12px;
-    }
-  }
-}
-
-ejs-autocomplete{
-  margin-top: 7px;
-  span{
-    background-color: white;
-    border: 1px solid grey;
-    display: flex;
-    justify-content: flex-start;
-    select{
-      width: 5px;
     }
   }
 }

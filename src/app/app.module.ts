@@ -2,7 +2,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { AppComponent } from './app.component';
 import { AuthInterceptor } from './shared/auth.interceptor';
 
@@ -15,7 +15,7 @@ import { AuthInterceptor } from './shared/auth.interceptor';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    AutoCompleteModule
+    AutocompleteLibModule
   ],
   providers: [
     {

@@ -25,17 +25,29 @@
         <option value="" selected disabled hidden>Scegli la provincia</option>
         <option *ngFor="let prov of province" (click)="selectProvince(prov)" [ngValue]="prov">{{prov}}</option>
       </select>
-      <ejs-autocomplete [dataSource]="comuniAutoComplete" [fields]="dataFields" formControlName="comune" (select)="selectCity($event)" placeholder="Seleziona un comune"></ejs-autocomplete>
+      <div class="ng-autocomplete" style="margin-left: 10px;">
+        <ng-autocomplete
+          [data]="comuniAutoComplete"
+          placeholder="Seleziona un comune"
+          (selected)='selectCity($event)'
+          [itemTemplate]="itemTemplate"
+          [notFoundTemplate]="notFoundTemplate">
+        </ng-autocomplete>
+
+        <ng-template #itemTemplate let-item>
+          <a [innerHTML]="item"></a>
+        </ng-template>
+
+        <ng-template #notFoundTemplate let-notFound>
+          <div [innerHTML]="notFound"></div>
+        </ng-template>
+      </div>
+
       <!-- <input class="myInput" type="text" placeholder="Comune" id="cap" formControlName="comune">
       <div class="errors">
         <span *ngIf="fiscalCodeForm.controls['cap'].errors && fiscalCodeForm.controls['cap'].touched">Inserire il comune</span> -->
       <!-- </div> -->
       <div></div>
-      <!-- <button type="button" class="sendCap" (click)="sendCap()">Invia CAP</button> -->
-      <!-- <select *ngIf="comuniCap.length" name="comuni" id="comuni" formControlName="comune" (change)="scegliComuneNascita()">
-        <option value="" selected disabled hidden>Scegli qui</option>
-        <option *ngFor="let comune of comuniCap" [ngValue]="comune">{{comune['nome']}}</option> -->
-      <!-- </select> -->
     </div>
     <div *ngIf="isLoading" class="cssload-container">
       <div class="cssload-speeding-wheel"></div>

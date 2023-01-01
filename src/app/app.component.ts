@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   public dataFields: Object = { value: 'comune' };
   public comuniAutoComplete: string[] = [];
   codiciFiscali: CodiciFiscali[] = [];
+  indexOmocodici = 0;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -154,13 +155,13 @@ export class AppComponent implements OnInit {
 
   checkOmofobia() {
     // GNCFNC00M19D208Y
-    let indexOmocodici = 0;
+    this.indexOmocodici = 0;
     this.codiciFiscali = this.codiciFiscali.map((obj: CodiciFiscali) => {
       if (obj.codiceFiscale === this.fiscalCode) {
-        this.fiscalCode = this.transformFiscalCode(this.fiscalCode, indexOmocodici);
+        this.fiscalCode = this.transformFiscalCode(this.fiscalCode);
         do {
-          obj.codiceFiscale = this.transformFiscalCode(obj.codiceFiscale, indexOmocodici);
-          indexOmocodici++;
+          obj.codiceFiscale = this.transformFiscalCode(obj.codiceFiscale);
+          this.indexOmocodici = this.indexOmocodici + 1;
         } while (obj.codiceFiscale === this.fiscalCode);
       }
       return obj;
@@ -168,20 +169,19 @@ export class AppComponent implements OnInit {
 
   }
 
-  trovaCarattereSostitutivo(fiscalCodeArray: string[], positionNumbers: number[], indexOmocodici: number) {
-    return omocodici.find((omocodice: any) => omocodice.cifra === +fiscalCodeArray[positionNumbers[indexOmocodici]])?.carattere ?? '';
+  trovaCarattereSostitutivo(fiscalCodeArray: string[], positionNumbers: number[]) {
+    return omocodici.find((omocodice: any) => omocodice.cifra === +fiscalCodeArray[positionNumbers[this.indexOmocodici]])?.carattere ?? '';
   }
 
-  transformFiscalCode(actualFiscalCode: string, indexOmocodici: number) {
-    // debug better
+  transformFiscalCode(actualFiscalCode: string) {
     let positionNumbers = [14, 13, 12, 10, 9, 7, 6];
     let fiscalCodeArray = actualFiscalCode.split('');
     let carattereSostitutivo = '';
     let isUnique = false;
     do {
-      carattereSostitutivo = this.trovaCarattereSostitutivo(fiscalCodeArray, positionNumbers, indexOmocodici);
-      fiscalCodeArray.splice(positionNumbers[indexOmocodici], 1, carattereSostitutivo);
-      indexOmocodici++;
+      carattereSostitutivo = this.trovaCarattereSostitutivo(fiscalCodeArray, positionNumbers);
+      fiscalCodeArray.splice(positionNumbers[this.indexOmocodici], 1, carattereSostitutivo);
+      this.indexOmocodici = this.indexOmocodici + 1;
       actualFiscalCode = fiscalCodeArray.join('');
       let temp = this.codiciFiscali.findIndex((obj2: CodiciFiscali) => actualFiscalCode === obj2.codiceFiscale);
       isUnique = temp != -1 ? true : false;

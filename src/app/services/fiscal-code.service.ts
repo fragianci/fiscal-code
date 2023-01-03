@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { alfanumericiDispari, alfanumericiPari } from '../shared/consts';
 
@@ -6,7 +7,9 @@ import { alfanumericiDispari, alfanumericiPari } from '../shared/consts';
 })
 export class FiscalCodeService {
 
-  constructor() { }
+  constructor(
+    private http: HttpClient,
+  ) { }
 
   findCarattereDiControllo(index: number, char: string) {
     if ((index % 2) === 0) {
@@ -22,6 +25,10 @@ export class FiscalCodeService {
 
   getItemLocalStorage(position: any): any {
     return window.localStorage.getItem(position);
+  }
+
+  readFileExcel() {
+    return this.http.get('assets/paesi-esteri/Elenco-codici-e-denominazioni-al-31_12_2021.xlsx', { responseType: 'blob' });
   }
 
 }

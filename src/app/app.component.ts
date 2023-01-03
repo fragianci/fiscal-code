@@ -4,6 +4,7 @@ import { ApiService } from './services/api.service';
 import { FiscalCodeService } from './services/fiscal-code.service';
 import { alfanumericiResto, dateBirthYears, omocodici } from './shared/consts';
 import { CodiciFiscali } from './shared/interfaces/codiciFiscali';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-root',
@@ -57,8 +58,7 @@ export class AppComponent implements OnInit {
     });
     this.codiciFiscali = JSON.parse(this.fiscalCodeService.getItemLocalStorage('codici-fiscali'));
     if (this.codiciFiscali === null) this.codiciFiscali = [];
-    console.log(this.codiciFiscali);
-
+    this.readFileExcel();
   }
 
   async submit() {
@@ -188,5 +188,26 @@ export class AppComponent implements OnInit {
     } while (isUnique);
     return actualFiscalCode;
   }
+
+  readFileExcel() {
+    this.fiscalCodeService.readFileExcel().subscribe({
+      next: (data: any) => {
+        const reader: FileReader = new FileReader();
+
+        reader.onload = (e: any) => {
+          const bstr: string = e.target.result;
+          const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+
+          const dataXlsx = XLSX.utils.sheet_to_json(wb.Sheets['Elenco 31122020']);
+          console.log(dataXlsx);
+        };
+        reader.readAsBinaryString(data);
+        console.log(data);
+      },
+      error: (error: any) => {
+        console.log(error);
+      }
+    });
+  };
 
 }

@@ -14,13 +14,6 @@
       <input class="myCheckbox" type="checkbox" id="female" [checked]="female" formControlName="female" [(ngModel)]="female">
     </div>
     <div class="comuneNascita">
-      <!-- <div class="input">
-        <input class="myInput" type="number" placeholder="Cap" id="cap" formControlName="cap">
-        <div class="errors">
-          <span *ngIf="fiscalCodeForm.controls['cap'].errors && fiscalCodeForm.controls['cap'].touched">Inserire il CAP</span>
-          <span *ngIf="capError">Comune non trovato</span>
-        </div>
-      </div> -->
       <select class="province" name="province" id="province" formControlName="provincia" (change)="selectProvince(fiscalCodeForm.controls['provincia'].value)">
         <option value="" selected disabled hidden>Scegli la provincia</option>
         <option *ngFor="let prov of province" (click)="selectProvince(prov)" [ngValue]="prov">{{prov}}</option>
@@ -28,7 +21,7 @@
       <div class="ng-autocomplete" style="margin-left: 10px;">
         <ng-autocomplete
           [data]="comuniAutoComplete"
-          placeholder="Seleziona un comune"
+          placeholder="Seleziona il comune di nascita"
           (selected)='selectCity($event)'
           [itemTemplate]="itemTemplate"
           [notFoundTemplate]="notFoundTemplate">

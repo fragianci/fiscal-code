@@ -1,12 +1,18 @@
 <div class="container">
   <h1>Scopri il tuo codice fiscale</h1>
-  <form [formGroup]="fiscalCodeForm" (ngSubmit)="submit()">
+  <div class="tabs">
+    <div class="tab" [ngClass]="{active: isItalianFiscalCode}" (click)="switchFiscalCodeForm()">Codice Fiscale italiano</div>
+    <div class="tab" [ngClass]="{active: !isItalianFiscalCode}" (click)="switchFiscalCodeForm()">Codice Fiscale estero</div>
+  </div>
+
+  <!-- Codice fiscale italiano -->
+  <form [formGroup]="fiscalCodeItalianForm" (ngSubmit)="submit()" *ngIf="isItalianFiscalCode">
     <input class="myInput" type="text" id="cognome" formControlName="cognome" placeholder="Cognome">
-    <span class="error" *ngIf="fiscalCodeForm.controls['cognome'].errors && fiscalCodeForm.controls['cognome'].touched">Selezionare un cognome</span>
+    <span class="error" *ngIf="fiscalCodeItalianForm.controls['cognome'].errors && fiscalCodeItalianForm.controls['cognome'].touched">Selezionare un cognome</span>
     <input class="myInput" type="text" id="nome" formControlName="nome" placeholder="Nome">
-    <span class="error" *ngIf="fiscalCodeForm.controls['nome'].errors && fiscalCodeForm.controls['nome'].touched">Selezionare un nome</span>
+    <span class="error" *ngIf="fiscalCodeItalianForm.controls['nome'].errors && fiscalCodeItalianForm.controls['nome'].touched">Selezionare un nome</span>
     <input class="myInput" type="date" id="dateBirth" formControlName="dateBirth" placeholder="Data di nascita">
-    <span class="error" *ngIf="fiscalCodeForm.controls['dateBirth'].errors && fiscalCodeForm.controls['dateBirth'].touched">Selezionare una data di nascita</span>
+    <span class="error" *ngIf="fiscalCodeItalianForm.controls['dateBirth'].errors && fiscalCodeItalianForm.controls['dateBirth'].touched">Selezionare una data di nascita</span>
     <div class="sessoDiv">
       <label for="male">M</label>
       <input class="myCheckbox" type="checkbox" id="male" [checked]="male" id="male" [(ngModel)]="male" formControlName="male">
@@ -14,7 +20,7 @@
       <input class="myCheckbox" type="checkbox" id="female" [checked]="female" formControlName="female" [(ngModel)]="female">
     </div>
     <div class="comuneNascita">
-      <select class="province" name="province" id="province" formControlName="provincia" (change)="selectProvince(fiscalCodeForm.controls['provincia'].value)">
+      <select class="province" name="province" id="province" formControlName="provincia" (change)="selectProvince(fiscalCodeItalianForm.controls['provincia'].value)">
         <option value="" selected disabled hidden>Scegli la provincia</option>
         <option *ngFor="let prov of province" (click)="selectProvince(prov)" [ngValue]="prov">{{prov}}</option>
       </select>
@@ -22,7 +28,7 @@
         <ng-autocomplete
           [data]="comuniAutoComplete"
           placeholder="Seleziona il comune di nascita"
-          (selected)='selectCity($event)'
+          (selected)='selectLocality($event)'
           [itemTemplate]="itemTemplate"
           [notFoundTemplate]="notFoundTemplate">
         </ng-autocomplete>
@@ -35,20 +41,62 @@
           <div [innerHTML]="notFound"></div>
         </ng-template>
       </div>
-
-      <!-- <input class="myInput" type="text" placeholder="Comune" id="cap" formControlName="comune">
-      <div class="errors">
-        <span *ngIf="fiscalCodeForm.controls['cap'].errors && fiscalCodeForm.controls['cap'].touched">Inserire il comune</span> -->
-      <!-- </div> -->
-      <div></div>
     </div>
     <div *ngIf="isLoading" class="cssload-container">
       <div class="cssload-speeding-wheel"></div>
     </div>
 
     <div class="buttonDiv">
-      <!-- fiscalCodeForm.invalid || !((!male && female) || (male && !female)) -->
-      <button type="submit" [disabled]="false" [ngClass]="{disable: fiscalCodeForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
+      <!-- fiscalCodeItalianForm.invalid || !((!male && female) || (male && !female)) -->
+      <button type="submit" [disabled]="false" [ngClass]="{disable: fiscalCodeItalianForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
+    </div>
+    <p>{{fiscalCode}}</p>
+  </form>
+
+  <!-- Codice fiscale estero -->
+  <form [formGroup]="fiscalCodeItalianForm" (ngSubmit)="submit()" *ngIf="!isItalianFiscalCode">
+    <input class="myInput" type="text" id="cognome" formControlName="cognome" placeholder="Cognome">
+    <span class="error" *ngIf="fiscalCodeItalianForm.controls['cognome'].errors && fiscalCodeItalianForm.controls['cognome'].touched">Selezionare un cognome</span>
+    <input class="myInput" type="text" id="nome" formControlName="nome" placeholder="Nome">
+    <span class="error" *ngIf="fiscalCodeItalianForm.controls['nome'].errors && fiscalCodeItalianForm.controls['nome'].touched">Selezionare un nome</span>
+    <input class="myInput" type="date" id="dateBirth" formControlName="dateBirth" placeholder="Data di nascita">
+    <span class="error" *ngIf="fiscalCodeItalianForm.controls['dateBirth'].errors && fiscalCodeItalianForm.controls['dateBirth'].touched">Selezionare una data di nascita</span>
+    <div class="sessoDiv">
+      <label for="male">M</label>
+      <input class="myCheckbox" type="checkbox" id="male" [checked]="male" id="male" [(ngModel)]="male" formControlName="male">
+      <label for="female">F</label>
+      <input class="myCheckbox" type="checkbox" id="female" [checked]="female" formControlName="female" [(ngModel)]="female">
+    </div>
+    <div class="comuneNascita">
+      <!-- <select class="province" name="province" id="province" formControlName="provincia" (change)="selectProvince(fiscalCodeItalianForm.controls['provincia'].value)">
+        <option value="" selected disabled hidden>Scegli lo stato di nas</option>
+        <option *ngFor="let prov of province" (click)="selectProvince(prov)" [ngValue]="prov">{{prov}}</option>
+      </select> -->
+      <div class="ng-autocomplete" style="margin-left: 10px;">
+        <ng-autocomplete
+          [data]="statiAutoComplete"
+          placeholder="Seleziona lo Stato di nascita"
+          (selected)='selectLocality($event)'
+          [itemTemplate]="itemTemplate"
+          [notFoundTemplate]="notFoundTemplate">
+        </ng-autocomplete>
+
+        <ng-template #itemTemplate let-item>
+          <a [innerHTML]="item"></a>
+        </ng-template>
+
+        <ng-template #notFoundTemplate let-notFound>
+          <div [innerHTML]="notFound"></div>
+        </ng-template>
+      </div>
+    </div>
+    <div *ngIf="isLoading" class="cssload-container">
+      <div class="cssload-speeding-wheel"></div>
+    </div>
+
+    <div class="buttonDiv">
+      <!-- fiscalCodeItalianForm.invalid || !((!male && female) || (male && !female)) -->
+      <button type="submit" [disabled]="false" [ngClass]="{disable: fiscalCodeItalianForm.invalid || !((!male && female) || (male && !female))}">Invia</button>
     </div>
     <p>{{fiscalCode}}</p>
   </form>

@@ -13,7 +13,8 @@ import * as XLSX from 'xlsx';
 })
 export class AppComponent implements OnInit {
   title = 'fiscal-code-generator';
-  fiscalCodeForm: FormGroup = new FormGroup({});
+  fiscalCodeItalianForm: FormGroup = new FormGroup({});
+  fiscalCodeForeignForm: FormGroup = new FormGroup({});
   consonantRegex = /[bcdfghjklmnpqrstvwxysBCDFGHJKLMNPQRSTVWXYZ]/g;
   vocalsRegex = /[aeiouAEIOU]/g;
   fiscalCode = '';
@@ -26,8 +27,10 @@ export class AppComponent implements OnInit {
   female = false;
   capError = false;
   isLoading = false;
-  public dataFields: Object = { value: 'comune' };
-  public comuniAutoComplete: string[] = [];
+  isItalianFiscalCode = true;
+  comuniAutoComplete: string[] = [];
+  statiAutoComplete: string[] = [];
+  dettaglioStati: any[] = [];
   codiciFiscali: CodiciFiscali[] = [];
   indexOmocodici = 0;
 
@@ -36,7 +39,7 @@ export class AppComponent implements OnInit {
     private apiService: ApiService,
     private fiscalCodeService: FiscalCodeService,
   ) {
-    this.fiscalCodeForm = this.formBuilder.group({
+    this.fiscalCodeItalianForm = this.formBuilder.group({
       cognome: ['', [Validators.required]],
       nome: ['', [Validators.required]],
       dateBirth: ['', [Validators.required]],
@@ -44,6 +47,14 @@ export class AppComponent implements OnInit {
       female: ['', []],
       provincia: ['', [Validators.required]],
       comune: ['', [Validators.required]],
+    });
+    this.fiscalCodeForeignForm = this.formBuilder.group({
+      cognome: ['', [Validators.required]],
+      nome: ['', [Validators.required]],
+      dateBirth: ['', [Validators.required]],
+      male: ['', []],
+      female: ['', []],
+      stato: ['', [Validators.required]],
     });
   }
 
@@ -62,13 +73,13 @@ export class AppComponent implements OnInit {
   }
 
   async submit() {
-    this.fiscalCode = this.extractConsonantsFromSurname(this.fiscalCodeForm.controls['cognome'].value)
-      + this.extractConsonantsFromName(this.fiscalCodeForm.controls['nome'].value)
-      + this.getDateBirth(this.fiscalCodeForm.controls['dateBirth'].value)
+    this.fiscalCode = this.extractConsonantsFromSurname(this.fiscalCodeItalianForm.controls['cognome'].value)
+      + this.extractConsonantsFromName(this.fiscalCodeItalianForm.controls['nome'].value)
+      + this.getDateBirth(this.fiscalCodeItalianForm.controls['dateBirth'].value)
       + this.codiceCatastale;
     this.getCarattereDiControllo();
     this.checkOmofobia();
-    const nomeCognome = this.fiscalCodeForm.controls['nome'].value + this.fiscalCodeForm.controls['cognome'].value;
+    const nomeCognome = this.fiscalCodeItalianForm.controls['nome'].value + this.fiscalCodeItalianForm.controls['cognome'].value;
     this.codiciFiscali.push({ nomeCognome: nomeCognome, codiceFiscale: this.fiscalCode });
     this.fiscalCodeService.setItemLocalStorage(`codici-fiscali`, this.codiciFiscali);
   }
@@ -115,12 +126,12 @@ export class AppComponent implements OnInit {
     const dateBirthArray = dateBirth.split('-');
     const year = dateBirthArray[0].split('').splice(2, 2).join('');
     const month = dateBirthYears.find((valor) => dateBirthArray[1] === valor.month)?.letter;
-    const day = this.fiscalCodeForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
+    const day = this.fiscalCodeItalianForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
     return year + month + day;
   }
 
   scegliComuneNascita() {
-    this.codiceCatastale = this.fiscalCodeForm.controls['comune'].value.codice_catastale;
+    this.codiceCatastale = this.fiscalCodeItalianForm.controls['comune'].value.codice_catastale;
   }
 
   getCarattereDiControllo() {
@@ -149,8 +160,13 @@ export class AppComponent implements OnInit {
     });
   }
 
-  selectCity(city: string) {
-    this.codiceCatastale = this.dettaglioComuni.find((comune: any) => comune.nome === city).codice_catastale;
+  selectLocality(locality: string) {
+    if (this.isItalianFiscalCode) {
+      this.codiceCatastale = this.dettaglioComuni.find((comune: any) => comune.nome === locality).codice_catastale;
+    } else {
+      console.log(locality);
+      this.codiceCatastale = this.dettaglioStati.find((stato: any) => stato['Denominazione IT'] === locality)['Codice AT'];
+    }
   }
 
   checkOmofobia() {
@@ -197,9 +213,8 @@ export class AppComponent implements OnInit {
         reader.onload = (e: any) => {
           const bstr: string = e.target.result;
           const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-
-          const dataXlsx = XLSX.utils.sheet_to_json(wb.Sheets['Elenco 31122020']);
-          console.log(dataXlsx);
+          this.dettaglioStati = XLSX.utils.sheet_to_json(wb.Sheets['Elenco 31122020']);
+          this.statiAutoComplete = this.dettaglioStati.map((data: any) => data['Denominazione IT']);
         };
         reader.readAsBinaryString(data);
         console.log(data);
@@ -209,5 +224,9 @@ export class AppComponent implements OnInit {
       }
     });
   };
+
+  switchFiscalCodeForm() {
+    this.isItalianFiscalCode = !this.isItalianFiscalCode;
+  }
 
 }

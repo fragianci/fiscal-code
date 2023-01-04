@@ -3,13 +3,53 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  .tabs{
+    display: flex;
+    width: 50%;
+    justify-content: space-around;
+    background-color: #dddddd;
+    height: 25px;
+    border-radius: 10px 10px 0 0;
+    align-items: center;
+    .tab{
+      width: 100%;
+      text-align: center;
+      height: inherit;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &:first-child{
+        border-right: 1px solid;
+        &.active{
+          border-radius: 10px 0 0 0;
+          background-color: #efefef;
+        }
+        &:hover{
+          cursor: pointer;
+          border-radius: 10px 0px 0 0;
+          background-color: #efefef;
+        }
+      }
+      &:last-child{
+        &.active{
+          border-radius: 0 10px 0 0;
+          background-color: #efefef;
+        }
+        &:hover{
+          cursor: pointer;
+          border-radius: 0 10px 0 0;
+          background-color: #efefef;
+        }
+      }
+    }
+  }
   form{
     background-color: #93e4ff91;
     display: flex;
     flex-direction: column;
     width: 30%;
     padding: 50px 10%;
-    border-radius: 11px;
+    border-radius: 0 0 11px 11px;
     .myInput{
       height: 16px;
       margin: 10px;

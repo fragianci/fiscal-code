@@ -72,14 +72,22 @@ export class AppComponent implements OnInit {
     this.readFileExcel();
   }
 
-  async submit() {
-    this.fiscalCode = this.extractConsonantsFromSurname(this.fiscalCodeItalianForm.controls['cognome'].value)
-      + this.extractConsonantsFromName(this.fiscalCodeItalianForm.controls['nome'].value)
-      + this.getDateBirth(this.fiscalCodeItalianForm.controls['dateBirth'].value)
+  submit() {
+    if (this.isItalianFiscalCode) {
+      this.retrieveFiscalCode(this.fiscalCodeItalianForm);
+    } else {
+      this.retrieveFiscalCode(this.fiscalCodeForeignForm);
+    }
+  }
+
+  retrieveFiscalCode(fiscalCodeForm: FormGroup<any>) {
+    this.fiscalCode = this.extractConsonantsFromSurname(fiscalCodeForm.controls['cognome'].value)
+      + this.extractConsonantsFromName(fiscalCodeForm.controls['nome'].value)
+      + this.getDateBirth(fiscalCodeForm.controls['dateBirth'].value)
       + this.codiceCatastale;
     this.getCarattereDiControllo();
     this.checkOmofobia();
-    const nomeCognome = this.fiscalCodeItalianForm.controls['nome'].value + this.fiscalCodeItalianForm.controls['cognome'].value;
+    const nomeCognome = fiscalCodeForm.controls['nome'].value + fiscalCodeForm.controls['cognome'].value;
     this.codiciFiscali.push({ nomeCognome: nomeCognome, codiceFiscale: this.fiscalCode });
     this.fiscalCodeService.setItemLocalStorage(`codici-fiscali`, this.codiciFiscali);
   }
@@ -126,12 +134,13 @@ export class AppComponent implements OnInit {
     const dateBirthArray = dateBirth.split('-');
     const year = dateBirthArray[0].split('').splice(2, 2).join('');
     const month = dateBirthYears.find((valor) => dateBirthArray[1] === valor.month)?.letter;
-    const day = this.fiscalCodeItalianForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
+    let day!: string;
+    if (this.isItalianFiscalCode) {
+      day = this.fiscalCodeItalianForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
+    } else {
+      day = this.fiscalCodeForeignForm.controls['female'].value === true ? (+dateBirthArray[2] + 40).toString() : dateBirthArray[2];
+    }
     return year + month + day;
-  }
-
-  scegliComuneNascita() {
-    this.codiceCatastale = this.fiscalCodeItalianForm.controls['comune'].value.codice_catastale;
   }
 
   getCarattereDiControllo() {
@@ -163,8 +172,8 @@ export class AppComponent implements OnInit {
   selectLocality(locality: string) {
     if (this.isItalianFiscalCode) {
       this.codiceCatastale = this.dettaglioComuni.find((comune: any) => comune.nome === locality).codice_catastale;
+      console.log(this.fiscalCodeItalianForm);
     } else {
-      console.log(locality);
       this.codiceCatastale = this.dettaglioStati.find((stato: any) => stato['Denominazione IT'] === locality)['Codice AT'];
     }
   }
@@ -217,7 +226,6 @@ export class AppComponent implements OnInit {
           this.statiAutoComplete = this.dettaglioStati.map((data: any) => data['Denominazione IT']);
         };
         reader.readAsBinaryString(data);
-        console.log(data);
       },
       error: (error: any) => {
         console.log(error);

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { alfanumericiDispari, alfanumericiPari } from '../shared/consts';
+import { alfanumericiDispari, alfanumericiPari, alfanumericiResto, omocodici } from '../shared/consts';
 
 @Injectable({
   providedIn: 'root'
@@ -11,15 +11,26 @@ export class FiscalCodeService {
     private http: HttpClient,
   ) { }
 
-  findCarattereDiControllo(index: number, char: string) {
-    if ((index % 2) === 0) {
-      return this.returnCarattereDiControllo(alfanumericiDispari, char);
-    } else {
-      return this.returnCarattereDiControllo(alfanumericiPari, char);
-    }
+  getCarattereDiControllo(fiscalCode: string) {
+    let index = 0;
+    let result = 0;
+    let temp: any = 0;
+    let carattereDiControllo = '';
+    fiscalCode.split('').forEach((char: string) => {
+      if ((index % 2) === 0) {
+        temp = this.findCarattereDiControllo(alfanumericiDispari, char);
+      } else {
+        temp = this.findCarattereDiControllo(alfanumericiPari, char);
+      }
+      if (temp) result += +temp;
+      index++;
+    });
+    let resto = result % 26;
+    carattereDiControllo = alfanumericiResto.find((alfaNumerico: any) => alfaNumerico.resto === resto.toString())?.lettera ?? '';
+    return carattereDiControllo;
   }
 
-  returnCarattereDiControllo(alfaNumerici: any[], char: string) {
+  findCarattereDiControllo(alfaNumerici: any[], char: string) {
     return alfaNumerici.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
   }
 
@@ -33,6 +44,14 @@ export class FiscalCodeService {
 
   readFileExcel() {
     return this.http.get('assets/paesi-esteri/Elenco-codici-e-denominazioni-al-31_12_2021.xlsx', { responseType: 'blob' });
+  }
+
+  getCodiciFiscali() {
+    return JSON.parse(this.getItemLocalStorage('codici-fiscali'));
+  }
+
+  trovaCarattereSostitutivo(fiscalCodeArray: string[], positionNumbers: number[], indexOmocodici: number) {
+    return omocodici.find((omocodice: any) => omocodice.cifra === +fiscalCodeArray[positionNumbers[indexOmocodici]])?.carattere ?? '';
   }
 
 }

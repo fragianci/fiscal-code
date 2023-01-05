@@ -1,5 +1,12 @@
+import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 import { AppComponent } from './app.component';
+import { ApiService } from './services/api.service';
+import { FiscalCodeService } from './services/fiscal-code.service';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -7,6 +14,17 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent
       ],
+      imports: [
+        BrowserModule,
+        FormsModule,
+        ReactiveFormsModule,
+        HttpClientModule,
+        AutocompleteLibModule
+      ],
+      providers: [
+        FiscalCodeService,
+        ApiService,
+      ]
     }).compileComponents();
   });
 
@@ -20,12 +38,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('fiscal-code-generator');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('fiscal-code-generator app is running!');
   });
 });

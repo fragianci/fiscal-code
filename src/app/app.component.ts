@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from './services/api.service';
 import { FiscalCodeService } from './services/fiscal-code.service';
 import { alfanumericiResto, dateBirthYears, omocodici } from './shared/consts';
-import { CodiciFiscali } from './shared/interfaces/codiciFiscali';
+import { CodiciFiscali, Provincia } from './shared/interfaces/interfaces';
 import * as XLSX from 'xlsx';
 
 @Component({
@@ -19,9 +19,8 @@ export class AppComponent implements OnInit {
   vocalsRegex = /[aeiouAEIOU]/g;
   fiscalCode = '';
   codiceCatastale = '';
-  carattereDiControllo = '';
   comuniCap = [];
-  province: any = [];
+  province!: Provincia[];
   dettaglioComuni: any = [];
   male = false;
   female = false;
@@ -59,16 +58,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.apiService.getProvince('').subscribe({
-      next: (res: any) => {
-        this.province = Object.keys(res.data);
-      },
-      error: (e: any) => {
-        console.log(e);
-      }
-    });
-    this.codiciFiscali = JSON.parse(this.fiscalCodeService.getItemLocalStorage('codici-fiscali'));
-    if (this.codiciFiscali === null) this.codiciFiscali = [];
+    this.getProvince();
+    this.getCodiciFiscali();
     this.readFileExcel();
   }
 
@@ -86,7 +77,7 @@ export class AppComponent implements OnInit {
       + this.getDateBirth(fiscalCodeForm.controls['dateBirth'].value)
       + this.codiceCatastale;
     this.getCarattereDiControllo();
-    this.checkOmofobia();
+    this.checkOmocodia();
     const nomeCognome = fiscalCodeForm.controls['nome'].value + fiscalCodeForm.controls['cognome'].value;
     this.codiciFiscali.push({ nomeCognome: nomeCognome, codiceFiscale: this.fiscalCode });
     this.fiscalCodeService.setItemLocalStorage(`codici-fiscali`, this.codiciFiscali);
@@ -144,17 +135,8 @@ export class AppComponent implements OnInit {
   }
 
   getCarattereDiControllo() {
-    let index = 0;
-    let result = 0;
-    let temp: any = 0;
-    this.fiscalCode.split('').forEach((char: string) => {
-      temp = this.fiscalCodeService.findCarattereDiControllo(index, char);
-      if (temp) result += +temp;
-      index++;
-    });
-    let resto = result % 26;
-    this.carattereDiControllo = alfanumericiResto.find((alfaNumerico: any) => alfaNumerico.resto === resto.toString())?.lettera ?? '';
-    this.fiscalCode = this.fiscalCode.toUpperCase() + this.carattereDiControllo;
+    let carattereDiControllo = this.fiscalCodeService.getCarattereDiControllo(this.fiscalCode);
+    this.fiscalCode = this.fiscalCode.toUpperCase() + carattereDiControllo;
   }
 
   selectProvince(provincia: string) {
@@ -172,13 +154,12 @@ export class AppComponent implements OnInit {
   selectLocality(locality: string) {
     if (this.isItalianFiscalCode) {
       this.codiceCatastale = this.dettaglioComuni.find((comune: any) => comune.nome === locality).codice_catastale;
-      console.log(this.fiscalCodeItalianForm);
     } else {
       this.codiceCatastale = this.dettaglioStati.find((stato: any) => stato['Denominazione IT'] === locality)['Codice AT'];
     }
   }
 
-  checkOmofobia() {
+  checkOmocodia() {
     // GNCFNC00M19D208Y
     this.indexOmocodici = 0;
     this.codiciFiscali = this.codiciFiscali.map((obj: CodiciFiscali) => {
@@ -191,11 +172,6 @@ export class AppComponent implements OnInit {
       }
       return obj;
     });
-
-  }
-
-  trovaCarattereSostitutivo(fiscalCodeArray: string[], positionNumbers: number[]) {
-    return omocodici.find((omocodice: any) => omocodice.cifra === +fiscalCodeArray[positionNumbers[this.indexOmocodici]])?.carattere ?? '';
   }
 
   transformFiscalCode(actualFiscalCode: string) {
@@ -204,7 +180,7 @@ export class AppComponent implements OnInit {
     let carattereSostitutivo = '';
     let isUnique = false;
     do {
-      carattereSostitutivo = this.trovaCarattereSostitutivo(fiscalCodeArray, positionNumbers);
+      carattereSostitutivo = this.fiscalCodeService.trovaCarattereSostitutivo(fiscalCodeArray, positionNumbers, this.indexOmocodici);
       fiscalCodeArray.splice(positionNumbers[this.indexOmocodici], 1, carattereSostitutivo);
       this.indexOmocodici = this.indexOmocodici + 1;
       actualFiscalCode = fiscalCodeArray.join('');
@@ -235,6 +211,24 @@ export class AppComponent implements OnInit {
 
   switchFiscalCodeForm() {
     this.isItalianFiscalCode = !this.isItalianFiscalCode;
+  }
+
+  getProvince() {
+    this.apiService.getProvince('').subscribe({
+      next: (res: any) => {
+        this.province = Object.entries(res.data).map((provincia: any) => {
+          return new Provincia({ sigla: provincia[0], nomeProvincia: provincia[1] });
+        });
+      },
+      error: (e: any) => {
+        console.log(e);
+      }
+    });
+  }
+
+  getCodiciFiscali() {
+    this.codiciFiscali = this.fiscalCodeService.getCodiciFiscali();
+    if (this.codiciFiscali === null) this.codiciFiscali = [];
   }
 
 }

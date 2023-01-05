@@ -22,7 +22,7 @@
     <div class="comuneNascita">
       <select class="province" name="province" id="province" formControlName="provincia" (change)="selectProvince(fiscalCodeItalianForm.controls['provincia'].value)">
         <option value="" selected disabled hidden>Scegli la provincia</option>
-        <option *ngFor="let prov of province" (click)="selectProvince(prov)" [ngValue]="prov">{{prov}}</option>
+        <option *ngFor="let prov of province" (click)="selectProvince(prov.sigla)" [ngValue]="prov.sigla">{{prov.nomeProvincia}}</option>
       </select>
       <div class="ng-autocomplete" style="margin-left: 10px;">
         <ng-autocomplete

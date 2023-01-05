@@ -146,7 +146,7 @@ export class AppComponent implements OnInit {
   getCarattereDiControllo() {
     let index = 0;
     let result = 0;
-    let temp: any;
+    let temp: any = 0;
     this.fiscalCode.split('').forEach((char: string) => {
       temp = this.fiscalCodeService.findCarattereDiControllo(index, char);
       if (temp) result += +temp;

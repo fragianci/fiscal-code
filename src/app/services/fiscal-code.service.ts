@@ -13,10 +13,14 @@ export class FiscalCodeService {
 
   findCarattereDiControllo(index: number, char: string) {
     if ((index % 2) === 0) {
-      return alfanumericiDispari.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
+      return this.returnCarattereDiControllo(alfanumericiDispari, char);
     } else {
-      return alfanumericiPari.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
+      return this.returnCarattereDiControllo(alfanumericiPari, char);
     }
+  }
+
+  returnCarattereDiControllo(alfaNumerici: any[], char: string) {
+    return alfaNumerici.find((alfaNumerico: any) => alfaNumerico.carattere == char.toUpperCase())?.valore;
   }
 
   setItemLocalStorage(position: string, value: any) {

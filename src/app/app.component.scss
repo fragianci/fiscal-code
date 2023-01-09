@@ -85,6 +85,9 @@
           outline: none;
         }
       }
+      .ng-autocomplete{
+        width: 100%;
+      }
     }
     .cssload-container {
       position: fixed;
@@ -170,6 +173,32 @@
     }
     span{
       margin: -7px 0 0 12px;
+    }
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .container{
+    .tabs{
+      width: 100%;
+    }
+    form{
+      width: 80%;
+    }
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .container{
+    .tab{
+      font-size: 12px;
+    }
+    .comuneNascita{
+      flex-direction: column;
+      margin-bottom: 20px;
+      .ng-autocomplete{
+        margin-top: 10px;
+      }
     }
   }
 }
